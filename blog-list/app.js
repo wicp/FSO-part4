@@ -5,8 +5,7 @@ const mongoose = require("mongoose")
 const config = require("./utils/config")
 const blogRouter = require("./controllers/blogs")
 
-const mongoUrl = `${config.MONGO_URL}/bloglist`
-mongoose.connect(mongoUrl, {
+mongoose.connect(config.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
