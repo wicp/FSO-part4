@@ -108,6 +108,16 @@ test("Missing url causes 400", async () => {
 
   await api.post("/api/blogs").send(newBlog).expect(400)
 })
+
+test("Deleting a blog", async () => {
+  const getResponse = await api.get("/api/blogs")
+  const blogToDelete = getResponse.body[0]
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+  const secondGet = await api.get("/api/blogs")
+  expect(secondGet.body[0]).not.toMatchObject(blogToDelete)
+  expect(secondGet.body).toHaveLength(testData.length - 1)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })

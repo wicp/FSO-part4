@@ -7,3 +7,5 @@ Content-Type: application/json
   "title": "test blog the sequel",
   "author": "tester 2"
 }
+###
+DELETE http://localhost:3003/api/blogs/607dd0c7108b8449a3cc8fe6
