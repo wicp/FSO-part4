@@ -5,7 +5,15 @@ Content-Type: application/json
 
 {
   "title": "test blog the sequel",
-  "author": "tester 2"
+  "author": "tester 2",
+  "url": "foo"
 }
 ###
 DELETE http://localhost:3003/api/blogs/607dd0c7108b8449a3cc8fe6
+###
+PUT http://localhost:3003/api/blogs/607ef0d41689bb75ad92e4c4
+Content-Type: application/json
+
+{
+  "likes": 5
+}

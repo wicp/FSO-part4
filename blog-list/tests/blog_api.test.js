@@ -118,6 +118,17 @@ test("Deleting a blog", async () => {
   expect(secondGet.body).toHaveLength(testData.length - 1)
 })
 
+test("Updating a blog", async () => {
+  const getResponse = await api.get("/api/blogs")
+  const updatedBlog = getResponse.body[0]
+
+  updatedBlog.likes += 1
+  const putResponse = await api.put(`/api/blogs/${updatedBlog.id}`).send(updatedBlog)
+  expect(putResponse.body.likes).toBe(updatedBlog.likes)
+  const secondGet = await api.get("/api/blogs")
+  expect(secondGet.body).toEqual(expect.arrayContaining([expect.objectContaining(updatedBlog)]))
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
