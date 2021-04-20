@@ -15,6 +15,7 @@ const testData = [
   {
     title: "test blog the sequel",
     author: "tester 2",
+    url: "test.com"
   },
 ]
 
@@ -77,7 +78,7 @@ test("Missing Likes field defaults to 0", async () => {
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/)
-  
+
   newBlog.likes = 0 // setup new Blog to match expected response
   //response from Post matches new blog
   expect(postResponse.body).toMatchObject(newBlog)
@@ -88,6 +89,25 @@ test("Missing Likes field defaults to 0", async () => {
   expect(getResponse.body[testData.length]).toMatchObject(newBlog)
 })
 
+test("Missing title causes 400", async () => {
+  const newBlog = {
+    author: "Jest",
+    url: "localhost",
+    likes: 0,
+  }
+
+  await api.post("/api/blogs").send(newBlog).expect(400)
+})
+
+test("Missing url causes 400", async () => {
+  const newBlog = {
+    title: "New blog test data",
+    author: "Jest",
+    likes: 0,
+  }
+
+  await api.post("/api/blogs").send(newBlog).expect(400)
+})
 afterAll(() => {
   mongoose.connection.close()
 })
