@@ -21,10 +21,10 @@ const testData = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  testData.forEach(async (blog) => {
+  for (let blog of testData) {
     const blogObject = new Blog(blog)
     await blogObject.save()
-  })
+  }
 })
 
 test("blogs are returned as json", async () => {
