@@ -129,6 +129,15 @@ test("Updating a blog", async () => {
   expect(secondGet.body).toEqual(expect.arrayContaining([expect.objectContaining(updatedBlog)]))
 })
 
+test("Handle malformed update", async () => {
+  const getResponse = await api.get("/api/blogs")
+  const updatedBlog = getResponse.body[0]
+
+  updatedBlog.likes = "oops"
+  await api.put(`/api/blogs/${updatedBlog.id}`).send(updatedBlog).expect(400)
+})
+
+
 afterAll(() => {
   mongoose.connection.close()
 })

@@ -18,10 +18,12 @@ blogRouter.delete("/:id", async (request, response) => {
 })
 
 blogRouter.put("/:id", async (request, response) => {
-  const update = {
-    likes: request.body.likes,
+  if (request.body.likes && !Number.isInteger(request.body.likes)) {
+    const ValidationError = new Error("Likes must be an integer")
+    ValidationError.name = "ValidationError"
+    throw ValidationError
   }
-  const result = await Blog.findByIdAndUpdate(request.params.id, update, {
+  const result = await Blog.findByIdAndUpdate(request.params.id, request.body, {
     new: true,
   })
   response.json(result)
