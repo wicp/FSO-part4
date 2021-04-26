@@ -9,12 +9,12 @@ const testData = [
   {
     username: "test user",
     name: "rest test",
-    password: "localhost",
+    passwordHash: "localhost",
   },
   {
     username: "test user the sequel",
     name: "tester 2",
-    password: "test.com",
+    passwordHash: "test.com",
   },
 ]
 
@@ -52,7 +52,7 @@ test("User can be created", async () => {
     name: "tester",
     password: "testing",
   }
-  const postResponse = await api.post("/api/users").expect(201)
+  const postResponse = await api.post("/api/users").send(testUser).expect(201)
   delete testUser.password
   expect(postResponse.body).toMatchObject(testUser)
 })
