@@ -5,7 +5,7 @@ const User = require("../models/user")
 
 const api = supertest(app)
 
-const testData = [
+const setupData = [
   {
     username: "test user",
     name: "rest test",
@@ -20,7 +20,7 @@ const testData = [
 
 beforeEach(async () => {
   await User.deleteMany({})
-  for (let user of testData) {
+  for (let user of setupData) {
     const userObject = new User(user)
     await userObject.save()
   }
@@ -35,7 +35,7 @@ test("users are returned as json", async () => {
 
 test("All test items are returned", async () => {
   const response = await api.get("/api/users")
-  expect(response.body).toHaveLength(testData.length)
+  expect(response.body).toHaveLength(setupData.length)
 })
 
 test("Responses have a username, name and password hash. Plaintext password not stored", async () => {
@@ -55,6 +55,44 @@ test("User can be created", async () => {
   const postResponse = await api.post("/api/users").send(testUser).expect(201)
   delete testUser.password
   expect(postResponse.body).toMatchObject(testUser)
+})
+
+test("Username is required", async () => {
+  const testUser = {
+    name: "foo",
+    password: "bar",
+  }
+  await api.post("/api/users").send(testUser).expect(400)
+})
+
+test("Password is required", async () => {
+  const testUser = {
+    username: "baz",
+    name: "foo",
+  }
+  await api.post("/api/users").send(testUser).expect(400)
+})
+
+test("Username must be at least 3 characters", async () => {
+  const testUser = {
+    username: "fo",
+    name: "bar",
+    password: "baz",
+  }
+  await api.post("/api/users").send(testUser).expect(400)
+})
+
+test("Password must be at least 3 characters", async () => {
+  const testUser = {
+    username: "foo",
+    name: "bar",
+    password: "bz",
+  }
+  await api.post("/api/users").send(testUser).expect(400)
+})
+
+test("Username must be unique", async () => {
+  await api.post("/api/users").send(setupData[0]).expect(400)
 })
 
 afterAll(() => {
