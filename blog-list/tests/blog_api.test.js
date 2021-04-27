@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const supertest = require("supertest")
 const app = require("../app")
 const Blog = require("../models/blog")
+const User = require("../models/user")
 
 const api = supertest(app)
 
@@ -15,13 +16,27 @@ const testData = [
   {
     title: "test blog the sequel",
     author: "tester 2",
-    url: "test.com"
+    url: "test.com",
   },
 ]
 
+const testUser = {
+  username: "Jester",
+  name: "Tester",
+  passwordHash: "607c324302d4e811a7c08089",
+}
+
+beforeAll(async () => {
+  await User.deleteMany({})
+  const userObject = new User(testUser)
+  await userObject.save()
+})
+
 beforeEach(async () => {
   await Blog.deleteMany({})
+  const savedUser = await User.findOne()
   for (let blog of testData) {
+    blog.user = savedUser.id
     const blogObject = new Blog(blog)
     await blogObject.save()
   }
@@ -42,6 +57,11 @@ test("All test items are returned", async () => {
 test("Responses have an id field", async () => {
   const response = await api.get("/api/blogs")
   expect(response.body[0].id).toBeDefined()
+})
+
+test("Responses have an associated user", async () => {
+  const response = await api.get("/api/blogs")
+  expect(response.body[0].user).toMatchObject(testUser)
 })
 
 test("New blogs are saved correctly", async () => {
@@ -120,13 +140,15 @@ test("Deleting a blog", async () => {
 
 test("Updating a blog", async () => {
   const getResponse = await api.get("/api/blogs")
-  const updatedBlog = getResponse.body[0]
-
+  const updatedBlog = { ...getResponse.body[0] }
   updatedBlog.likes += 1
-  const putResponse = await api.put(`/api/blogs/${updatedBlog.id}`).send(updatedBlog)
+  const putResponse = await api.put(`/api/blogs/${updatedBlog.id}`).send({ likes: updatedBlog.likes })
+  console.log(putResponse.body)
   expect(putResponse.body.likes).toBe(updatedBlog.likes)
   const secondGet = await api.get("/api/blogs")
-  expect(secondGet.body).toEqual(expect.arrayContaining([expect.objectContaining(updatedBlog)]))
+  expect(secondGet.body).toEqual(
+    expect.arrayContaining([expect.objectContaining(updatedBlog)])
+  )
 })
 
 test("Handle malformed update", async () => {
@@ -136,7 +158,6 @@ test("Handle malformed update", async () => {
   updatedBlog.likes = "oops"
   await api.put(`/api/blogs/${updatedBlog.id}`).send(updatedBlog).expect(400)
 })
-
 
 afterAll(() => {
   mongoose.connection.close()
