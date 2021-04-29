@@ -101,6 +101,13 @@ test("Login with good credentials is succesful", async () => {
   expect(postResponse.body.token).toBeDefined()
 })
 
+test("Login with bad credentials is unsuccesful", async () => {
+  const credentials = {...setupData[0]}
+  credentials.password = "incorrect"
+  const postResponse = await api.post("/api/login").send(credentials).expect(401)
+  expect(postResponse.body.token).not.toBeDefined()
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
