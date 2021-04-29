@@ -143,7 +143,6 @@ test("Updating a blog", async () => {
   const updatedBlog = { ...getResponse.body[0] }
   updatedBlog.likes += 1
   const putResponse = await api.put(`/api/blogs/${updatedBlog.id}`).send({ likes: updatedBlog.likes })
-  console.log(putResponse.body)
   expect(putResponse.body.likes).toBe(updatedBlog.likes)
   const secondGet = await api.get("/api/blogs")
   expect(secondGet.body).toEqual(
