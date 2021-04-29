@@ -11,7 +11,6 @@ userRouter.get("/", async (request, response) => {
     return userObj
   })
   const usersWithBlogs = await Promise.all(promises)
-  console.log(usersWithBlogs)
   response.json(usersWithBlogs)
 })
 

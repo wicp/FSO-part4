@@ -9,7 +9,8 @@ const setupData = [
   {
     username: "test user",
     name: "rest test",
-    passwordHash: "localhost",
+    password: "hunter1",
+    passwordHash: "$2b$10$4vs2ftzk1JrentOv/Y2PKum//EZgJF6.fBB3igQhSYWAaGLb8i4je",
   },
   {
     username: "test user the sequel",
@@ -93,6 +94,11 @@ test("Password must be at least 3 characters", async () => {
 
 test("Username must be unique", async () => {
   await api.post("/api/users").send(setupData[0]).expect(400)
+})
+
+test("Login with good credentials is succesful", async () => {
+  const postResponse = await api.post("/api/login").send(setupData[0]).expect(200)
+  expect(postResponse.body.token).toBeDefined()
 })
 
 afterAll(() => {
