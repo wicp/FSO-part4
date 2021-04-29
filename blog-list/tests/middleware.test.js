@@ -8,7 +8,7 @@ const jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QgYmxvZy
 test("Token is extracted", () => {
   const request = {
     get: (field) =>
-      field === "authorization"
+      field === "Authorization"
         ? `Bearer ${jwt}`
         : undefined,
   }
