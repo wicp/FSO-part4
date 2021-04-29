@@ -10,7 +10,16 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
+const tokenExtractor = (request, response, next) => {
+  const matches = request.get("Authorization")?.match(/^Bearer (\S+)/)
+  if (matches instanceof Array && matches[1]) {
+    request.token = matches[1]
+  }
+  next()
+}
+
 module.exports = {
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
 }

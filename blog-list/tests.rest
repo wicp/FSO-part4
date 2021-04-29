@@ -2,6 +2,7 @@ GET http://localhost:3003/api/users
 ###
 POST http://localhost:3003/api/blogs 
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QgYmxvZyB0aGUgc2VxdWwiLCJ1c2VySWQiOiI2MDhhODFmYzg4MDRlNTBlOGE2ZWNkOTIiLCJpYXQiOjE2MTk3MjExMjR9.fbFV_H1Ri2925iWMM762fDl8yRwZWJ_vaIWaMivP9vc
 
 {
   "title": "test blog the sequel",

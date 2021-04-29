@@ -1,6 +1,8 @@
 const blogRouter = require("express").Router()
 const Blog = require("../models/blog")
 const User = require("../models/user")
+const jwt = require("jsonwebtoken")
+const { JWT_SECRET } = require("../utils/config")
 
 blogRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user")
@@ -8,7 +10,16 @@ blogRouter.get("/", async (request, response) => {
 })
 
 blogRouter.post("/", async (request, response) => {
-  const user = await User.findOne()
+  const token = request.token
+  if (!token) return response.status(401).end()
+  let decodedToken
+  try {
+    decodedToken = jwt.verify(token, JWT_SECRET)
+  } catch {
+    return response.status(401).end()
+  }
+  const user = await User.findOne({ _id: decodedToken.userId })
+  if (!user) return response.status(401).end()
   const blog = new Blog({ ...request.body, user: user.id })
   const result = await blog.save()
   response.status(201).json(result)
