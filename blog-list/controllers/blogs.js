@@ -1,33 +1,30 @@
 const blogRouter = require("express").Router()
 const Blog = require("../models/blog")
-const User = require("../models/user")
-const jwt = require("jsonwebtoken")
-const { JWT_SECRET } = require("../utils/config")
+const middleware = require("../utils/middleware")
 
 blogRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user")
   response.json(blogs)
 })
 
-blogRouter.post("/", async (request, response) => {
-  const token = request.token
-  if (!token) return response.status(401).end()
-  let decodedToken
-  try {
-    decodedToken = jwt.verify(token, JWT_SECRET)
-  } catch {
-    return response.status(401).end()
-  }
-  const user = await User.findOne({ _id: decodedToken.userId })
-  if (!user) return response.status(401).end()
-  const blog = new Blog({ ...request.body, user: user.id })
+blogRouter.post("/", middleware.userExtractor, async (request, response) => {
+  const blog = new Blog({ ...request.body, user: request.user.id })
   const result = await blog.save()
   response.status(201).json(result)
 })
 
-blogRouter.delete("/:id", async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
+blogRouter.delete("/:id", middleware.userExtractor, async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+
+  if (!blog) return response.status(204).end()
+
+  if(blog.user.toString() === request.user.id) {
+    blog.delete()
+    response.status(204).end()
+  }
+  else {
+    response.status(403).end()
+  }
 })
 
 blogRouter.put("/:id", async (request, response) => {

@@ -1,4 +1,4 @@
-GET http://localhost:3003/api/users
+GET http://localhost:3003/api/blogs
 ###
 POST http://localhost:3003/api/blogs 
 Content-Type: application/json
@@ -10,8 +10,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc
   "url": "foo"
 }
 ###
-DELETE http://localhost:3003/api/blogs/607dd0c7108b8449a3cc8fe6
-###
+DELETE http://localhost:3003/api/blogs/608b00df24b5222d7860d13b
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QgdXNlciAxMjMiLCJ1c2VySWQiOiI2MDhjNjI2M2UwZjJlMTQwMjMxMzZhZGQiLCJpYXQiOjE2MTk4MTI5ODd9.cRx3vqnMuUyrBLYggj6q_dikVp0MPGoZll6mnn3B4IU
+####
 PUT http://localhost:3003/api/blogs/607ef0d41689bb75ad92e4c4
 Content-Type: application/json
 
@@ -24,7 +25,7 @@ POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-  "username": "test blog the sequl",
+  "username": "test user 123",
   "name": "tester 2",
   "password": "hunter1"
 }
@@ -33,6 +34,6 @@ POST http://localhost:3003/api/login
 Content-Type: application/json
 
 {
-  "username": "test blog the sequl",
+  "username": "test user 123",
   "password": "hunter1"
 }
