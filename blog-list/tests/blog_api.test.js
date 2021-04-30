@@ -23,13 +23,19 @@ const testData = [
 const testUser = {
   username: "Jester",
   name: "Tester",
-  passwordHash: "607c324302d4e811a7c08089",
+  passwordHash: "$2b$10$G.iV66RDLJ4fZaWYWVQZGejgu6pRcYE4OWX11RPfP6r3HcuzYh1O.",
 }
+
+let authHeader
 
 beforeAll(async () => {
   await User.deleteMany({})
   const userObject = new User(testUser)
   await userObject.save()
+  const login = await api
+    .post("/api/login")
+    .send({ username: testUser.username, password: "hunter1" })
+  authHeader = `Bearer ${login.body.token}`
 })
 
 beforeEach(async () => {
@@ -75,6 +81,7 @@ test("New blogs are saved correctly", async () => {
   const postResponse = await api
     .post("/api/blogs")
     .send(newBlog)
+    .set("Authorization", authHeader)
     .expect(201)
     .expect("Content-Type", /application\/json/)
   //response from Post matches new blog
@@ -96,6 +103,7 @@ test("Missing Likes field defaults to 0", async () => {
   const postResponse = await api
     .post("/api/blogs")
     .send(newBlog)
+    .set("Authorization", authHeader)
     .expect(201)
     .expect("Content-Type", /application\/json/)
 
@@ -116,7 +124,11 @@ test("Missing title causes 400", async () => {
     likes: 0,
   }
 
-  await api.post("/api/blogs").send(newBlog).expect(400)
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set("Authorization", authHeader)
+    .expect(400)
 })
 
 test("Missing url causes 400", async () => {
@@ -126,13 +138,20 @@ test("Missing url causes 400", async () => {
     likes: 0,
   }
 
-  await api.post("/api/blogs").send(newBlog).expect(400)
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set("Authorization", authHeader)
+    .expect(400)
 })
 
 test("Deleting a blog", async () => {
   const getResponse = await api.get("/api/blogs")
   const blogToDelete = getResponse.body[0]
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .set("Authorization", authHeader)
+    .expect(204)
   const secondGet = await api.get("/api/blogs")
   expect(secondGet.body[0]).not.toMatchObject(blogToDelete)
   expect(secondGet.body).toHaveLength(testData.length - 1)
@@ -142,7 +161,9 @@ test("Updating a blog", async () => {
   const getResponse = await api.get("/api/blogs")
   const updatedBlog = { ...getResponse.body[0] }
   updatedBlog.likes += 1
-  const putResponse = await api.put(`/api/blogs/${updatedBlog.id}`).send({ likes: updatedBlog.likes })
+  const putResponse = await api
+    .put(`/api/blogs/${updatedBlog.id}`)
+    .send({ likes: updatedBlog.likes })
   expect(putResponse.body.likes).toBe(updatedBlog.likes)
   const secondGet = await api.get("/api/blogs")
   expect(secondGet.body).toEqual(
