@@ -93,6 +93,20 @@ test("New blogs are saved correctly", async () => {
   expect(getResponse.body[testData.length]).toMatchObject(newBlog)
 })
 
+test("Creating blogs forbidden when not logged in", async () => {
+  const newBlog = {
+    title: "New blog test data",
+    author: "Jest",
+    url: "localhost",
+    likes: 0,
+  }
+
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(401)
+})
+
 test("Missing Likes field defaults to 0", async () => {
   const newBlog = {
     title: "New blog test data",
